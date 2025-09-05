@@ -12,10 +12,10 @@ import jsPDF from 'jspdf';
 export type FontOption = 'font-body' | 'font-serif' | 'font-sans';
 
 export default function Home() {
-  const [designation, setDesignation] = useState('Asst. Prof.');
-  const [teacherName, setTeacherName] = useState<string | null>('Mr. Anderson');
+  const [designation, setDesignation] = useState('');
+  const [teacherName, setTeacherName] = useState<string | null>('');
   const [teacherImage, setTeacherImage] = useState<string | null>(null);
-  const [dept, setDept] = useState<string | null>('CSE');
+  const [dept, setDept] = useState<string | null>('');
 
   const cardRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -116,21 +116,7 @@ export default function Home() {
     }
   };
   
-  const handleShare = (platform: 'whatsapp' | 'email') => {
-    const shareText = `Check out this card I made!`;
-    const url = "https://festivio-app.com" // Placeholder URL
-    let shareUrl = '';
-
-    if (platform === 'whatsapp') {
-      shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' ' + url)}`;
-    } else if (platform === 'email') {
-      shareUrl = `mailto:?subject=A card for you!&body=${encodeURIComponent(shareText + '\n\n' + url)}`;
-    }
-    
-    if (shareUrl) {
-      window.open(shareUrl, '_blank');
-    }
-  };
+  // share options removed
 
 
   return (
@@ -147,7 +133,6 @@ export default function Home() {
             setDept={setDept}
             handleTeacherImageUpload={handleTeacherImageUpload}
             handleDownload={handleDownload}
-            handleShare={handleShare}
           />
         </div>
     <div 

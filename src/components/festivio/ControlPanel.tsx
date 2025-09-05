@@ -18,14 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Download,
-  Share2,
-  Mail,
-  FileText,
-  FileImage,
-  User,
-} from 'lucide-react';
+import { Download, FileText, FileImage, User } from 'lucide-react';
 
 interface ControlPanelProps {
   designation: string;
@@ -36,7 +29,6 @@ interface ControlPanelProps {
   setDept: Dispatch<SetStateAction<string | null>>;
   handleTeacherImageUpload: (e: ChangeEvent<HTMLInputElement>) => void;
   handleDownload: (format: 'png' | 'pdf') => void;
-  handleShare: (platform: 'whatsapp' | 'email') => void;
 }
 
 export function ControlPanel({
@@ -48,7 +40,6 @@ export function ControlPanel({
   setDept,
   handleTeacherImageUpload,
   handleDownload,
-  handleShare,
 }: ControlPanelProps) {
   return (
     <Card className="bg-card/80 border-border/50 sticky top-8">
@@ -69,8 +60,9 @@ export function ControlPanel({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="HOD">HOD</SelectItem>
+                    <SelectItem value="Principal">Principal</SelectItem>
                     <SelectItem value="Asst. Prof.">Asst. Prof.</SelectItem>
-                    <SelectItem value="Prof.">Prof.</SelectItem>
+                    <SelectItem value="Assoc. Prof.">Assoc. Prof.</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -114,7 +106,7 @@ export function ControlPanel({
           </AccordionItem>
           
           <AccordionItem value="item-4">
-            <AccordionTrigger className="font-headline">Export & Share</AccordionTrigger>
+            <AccordionTrigger className="font-headline">Export</AccordionTrigger>
             <AccordionContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-2">
                     <Button variant="outline" onClick={() => handleDownload('png')}>
@@ -124,16 +116,6 @@ export function ControlPanel({
                      <Button variant="outline" onClick={() => handleDownload('pdf')}>
                         <FileText className="mr-2 h-4 w-4" />
                         PDF
-                    </Button>
-                </div>
-                 <div className="grid grid-cols-2 gap-2">
-                     <Button variant="outline" onClick={() => handleShare('whatsapp')}>
-                        <Share2 className="mr-2 h-4 w-4" />
-                        WhatsApp
-                    </Button>
-                     <Button variant="outline" onClick={() => handleShare('email')}>
-                        <Mail className="mr-2 h-4 w-4" />
-                        Email
                     </Button>
                 </div>
             </AccordionContent>
