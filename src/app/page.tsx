@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, type RefObject } from 'react';
+import { useState, useRef, type RefObject, useEffect } from 'react';
 import type { CardTemplateProps } from '@/components/festivio/templates/types';
 import Header from '@/components/festivio/Header';
 import { ControlPanel } from '@/components/festivio/ControlPanel';
@@ -19,6 +19,33 @@ export default function Home() {
 
   const cardRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  // Responsive render dimensions for desktop vs mobile
+  const [renderWidth, setRenderWidth] = useState<number>(3500);
+  const [renderHeight, setRenderHeight] = useState<number>(2625);
+  const [renderScale, setRenderScale] = useState<number>(2);
+
+  useEffect(() => {
+    const compute = () => {
+      const isSmallScreen = typeof window !== 'undefined' && window.innerWidth < 768;
+      if (isSmallScreen) {
+        setRenderWidth(2400);
+        setRenderHeight(1800);
+        const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1.5;
+        setRenderScale(Math.max(1, Math.min(dpr, 1.5)));
+      } else {
+        setRenderWidth(3500);
+        setRenderHeight(2625);
+        const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 2;
+        setRenderScale(Math.max(1.5, dpr));
+      }
+    };
+    compute();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', compute);
+      return () => window.removeEventListener('resize', compute);
+    }
+  }, []);
 
   const resizeImage = (file: File, callback: (dataUrl: string) => void) => {
     const reader = new FileReader();
@@ -88,23 +115,30 @@ export default function Home() {
 
     try {
       const canvas = await html2canvas(cardRef.current, {
-        scale: 2,
+        scale: renderScale,
         useCORS: true,
         allowTaint: true,
         backgroundColor: null,
         logging: false,
-        width: 3500,
-        height: 2625,
+        width: renderWidth,
+        height: renderHeight,
       });
 
       if (format === 'png') {
-        const data = canvas.toDataURL('image/png', 1.0); 
+        const data = canvas.toDataURL('image/png', 1.0);
         const link = document.createElement('a');
         link.href = data;
         link.download = 'festivio-card.png';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        toast({ title: 'Download started', description: 'Please check your downloads folder.' });
+      } else if (format === 'pdf') {
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        const pdf = new jsPDF({ orientation: renderWidth >= renderHeight ? 'landscape' : 'portrait', unit: 'px', format: [renderWidth, renderHeight] });
+        pdf.addImage(imgData, 'PNG', 0, 0, renderWidth, renderHeight);
+        pdf.save('festivio-card.pdf');
+        toast({ title: 'Download started', description: 'Please check your downloads folder.' });
       }
     } catch (error) {
       console.error('Error generating canvas:', error);
@@ -133,6 +167,7 @@ export default function Home() {
             setDept={setDept}
             handleTeacherImageUpload={handleTeacherImageUpload}
             handleDownload={handleDownload}
+            hasImage={!!teacherImage}
           />
         </div>
     <div 
@@ -140,8 +175,8 @@ export default function Home() {
       style={{
         top: 0,
         left: 0,
-        width: '3500px',
-        height: '2625px',
+        width: `${renderWidth}px`,
+        height: `${renderHeight}px`,
         zIndex: -1
       }}
     >

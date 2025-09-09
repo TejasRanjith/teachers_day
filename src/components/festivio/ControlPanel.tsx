@@ -11,13 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+// Replaced custom Select with native select for better mobile UX
 import { Download, FileText, FileImage, User } from 'lucide-react';
 
 interface ControlPanelProps {
@@ -29,6 +23,7 @@ interface ControlPanelProps {
   setDept: Dispatch<SetStateAction<string | null>>;
   handleTeacherImageUpload: (e: ChangeEvent<HTMLInputElement>) => void;
   handleDownload: (format: 'png' | 'pdf') => void;
+  hasImage?: boolean;
 }
 
 export function ControlPanel({
@@ -40,6 +35,7 @@ export function ControlPanel({
   setDept,
   handleTeacherImageUpload,
   handleDownload,
+  hasImage = false,
 }: ControlPanelProps) {
   return (
     <Card className="bg-card/80 border-border/50 sticky top-8">
@@ -54,17 +50,18 @@ export function ControlPanel({
             <AccordionContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="designation">Designation</Label>
-                <Select value={designation} onValueChange={setDesignation}>
-                  <SelectTrigger id="designation">
-                    <SelectValue placeholder="Select a designation" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="HOD">HOD</SelectItem>
-                    <SelectItem value="Principal">Principal</SelectItem>
-                    <SelectItem value="Asst. Prof.">Asst. Prof.</SelectItem>
-                    <SelectItem value="Assoc. Prof.">Assoc. Prof.</SelectItem>
-                  </SelectContent>
-                </Select>
+                <select
+                  id="designation"
+                  className="h-9 px-3 mx-4 text-sm w-56 sm:w-64 rounded-md border bg-background"
+                  value={designation}
+                  onChange={(e) => setDesignation(e.target.value)}
+                >
+                  <option value="" disabled>Select a designation</option>
+                  <option value="HOD">HOD</option>
+                  <option value="Principal">Principal</option>
+                  <option value="Asst. Prof.">Asst. Prof.</option>
+                  <option value="Assoc. Prof.">Assoc. Prof.</option>
+                </select>
               </div>
                <div className="space-y-2">
                 <Label htmlFor="teacher-name">Teacher's Name</Label>
@@ -88,16 +85,22 @@ export function ControlPanel({
                 <Label htmlFor="teacher-image-upload" className="mb-2 block">
                   Upload Teacher's Image
                 </Label>
-                <Button asChild variant="outline" className="w-full">
-                  <label htmlFor="teacher-image-upload" className="cursor-pointer">
+                <Button asChild variant="outline" className="w-full" disabled={hasImage}>
+                  <label
+                    htmlFor="teacher-image-upload"
+                    className={hasImage ? "cursor-not-allowed opacity-60 pointer-events-none" : "cursor-pointer"}
+                    aria-disabled={hasImage}
+                    title={hasImage ? "Photo already uploaded" : undefined}
+                  >
                     <User className="mr-2 h-4 w-4" />
-                    Choose teacher's photo
+                    {hasImage ? "Photo uploaded" : "Choose teacher's photo"}
                     <input
                       id="teacher-image-upload"
                       type="file"
                       className="hidden"
                       accept="image/*"
-                      onChange={handleTeacherImageUpload}
+                      onChange={hasImage ? undefined as any : handleTeacherImageUpload}
+                      disabled={hasImage}
                     />
                   </label>
                 </Button>
